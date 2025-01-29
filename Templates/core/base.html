@@ -1,0 +1,27 @@
+{% load static %}
+<!doctype html>
+<html class="no-js" lang="en">
+  
+{% include 'core/partials/_header.html' %}
+    	
+	<body>
+		<header>
+		<!-- top-area Start -->
+		{% include 'core/partials/_Navbar.html' %}
+		</header>
+		<!-- top-area End -->
+
+		<main>
+			<!-- Main Content -->
+			{% block content %}
+			
+			
+			{% endblock %}
+			
+
+		  </main>		
+		   <!-- Footer -->
+  {% include 'core/partials/_footer.html' %}
+    </body>
+	
+</html>

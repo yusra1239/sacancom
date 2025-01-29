@@ -1,0 +1,113 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+<section id="reviews" class="reviews"style="margin-bottom: 0px;padding-bottom: 0px;">
+    <div class="section-header">
+        <h2> تفاصيل عن الاعلان</h2>
+    </div>
+    <div class="reviews-content">
+        <div class="testimonial-carousel">
+            {% if images %}
+            {% for image in images %}
+                        <div class="single-testimonial-boxs">
+                            <div class="testimonial-comment">
+                             <img src="{{ image.photo.url }}" alt="Real Estate Image"style="width: 400px;  height: 300px;object-fit: cover;">
+                          
+                            </div><!--/.testimonial-comment-->
+                        </div><!--/.single-testimonial-box-->
+                        {% endfor %}
+                        {% else %}
+                       <p>لا توجد صور متاحة.</p>
+                       {% endif %}       
+               
+            </div>
+        </div>
+      
+</section>
+
+<section id="works" class="works" style="margin: 0px;padding: 0px;">
+    <div class="container ">
+        <div class="works-content">
+            <div class="row">
+                <div class="col-md-3 col-sm-5">
+                    <div class="single-how-works-show">
+                        <div class="single-how-works-icon">
+                            <i class="flaticon-building"></i>
+                        </div>
+                        <h1><br>مميزات العقار</h1>
+                        <div>
+                            {% if features %}
+                                  {% for feature in features %}
+                             <p>{{ feature.feature_ID.feature_name }}</p>
+                            {% endfor %}
+                                   {% else %}
+                            <p>لا توجد مميزات متاحة.</p>
+                          {% endif %}
+                          <p>تقييمات الناس للاعلان: 
+                            {{ average_rating|default:"لم يتم تقييمه بعد" }}
+                         </p>
+                        </div>
+                    </div>
+                </div>
+                    <div class=" col-sm-9 col-xl-6 ">
+                        <div class="single-how-works-show">
+                            <h2>تفاصيل العقار</h2>
+                            <p>
+                                {{ads.details}}
+                            </p>
+                           
+                            
+                        </div>
+                        <form action="chatting.html">
+                            <button class="welcome-hero-btn" href='www.google.com'>
+                               للتواصل مع المعلن   
+                           </button>					
+                        </form> 
+                    </div>
+                    <div class="col-md-3 col-sm-5">
+                        <div class="single-how-works-show">
+                            <div class="single-explore-img">
+                                <i class="flaticon-lightbulb-idea"></i>
+                            </div>
+                            <h1><br>تفاصيل اكثر</h1>
+                            <div>
+                                عدد الغرف : {{ real_estate.rooms }}<br>
+                                المساحة: {{ real_estate.space }} م²<br>
+                                الدور: {{ real_estate.floor }}<br>
+                                تاريخ الاعلان : {{ads.publish_date}}<br>
+                               الموقع :  {{real_estate.area_id}}<br>
+                                السعر:  {{ real_estate.price }}<br>  
+                                حالة الإعلان :   {{ ads.advertising_state|yesno:"مفعل,ملغي" }}<br>  <br> 
+                                <h1>Rate Advertisement: {{ advertisement.id }}</h1>
+                    
+                               
+                                {% if user_rating %}
+<p>تقييمك الحالي: {{ user_rating.stars }} نجوم</p>
+{% else %}
+<form method="POST">
+    {% csrf_token %}
+    <p>قيم:
+        <span class="star-rating">
+            {% for i in "12345" %}
+            <label for="rate-{{ i }}" style="--i:{{ i }}">
+                <i class="fa-solid fa-star"></i>
+            </label>
+            <input type="radio" name="rating" id="rate-{{ i }}" value="{{ i }}">
+            {% endfor %}
+        </span>
+    </p>
+    <button type="submit">اضغط لارسال التقييم</button>
+</form>
+{% endif %}                     
+                            </div>
+                        </div>
+                    </div>
+                   
+            </div>
+       
+        </div>
+    </div>
+</section>
+
+
+{%endblock%}

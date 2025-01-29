@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+    <section id="home" >
+        <div class="container style">
+            <div class="welcome-hero-serch-box" style="margin-left: 350px;">
+                <div class="welcome-hero-form">
+                    
+                        <div class="row">
+                        <form action="index.html">
+                            <select class="welcome-hero-btn" id="floatingSelect"
+                                aria-label="Floating label select example">
+                                <option selected>اختر المديرية  في صنعاء </option>
+                                <option value="1">التحرير</option>
+                                <option value="2">معين</option>
+                                <option value="3">الصافية</option>
+                                <option value="3">صنعاء القديمة</option>
+                            </select>
+                        </form>
+                        </div>
+                        <div class="row">
+                            <form action="index.html">
+                                <button class="welcome-hero-btn" onclick="window.location.href='https:\\www.google.com'">
+                                    الموقع الجغرافي   <i data-feather="search"></i> 
+                               </button>					
+                            </form> 
+                        </div>
+                    </div>
+                </div>					
+            </div>
+        </div>
+    </section><!--/.welcome-hero-->
+    <!--welcome-hero end -->
+    <section id="blog" class="blog" >
+        <div class="container">
+            <div class="explore-content">
+                <div class="row">
+            {% for Advertisement  in Advertisement%}
+            <div class=" col-md-4 col-sm-6">
+                <div class="single-explore-item">
+                    <div class="single-explore-img" >
+                        
+                           
+                    </div>
+                    <div class="single-explore-txt bg-theme-1">
+                        <h2>{{Advertisement.Service_id.name}}</h2>
+                        <p class="explore-rating-price">
+                            التقييم
+                            <span class="explore-rating">5.0</span>
+                            
+                            <a> نوع الخدمة:  {{ Advertisement.Service_id.Services_details_id.name }}</a>	 
+                            |<a>المنطقة:    {{ Advertisement.Service_id.directorate_name }} </a>	|
+                            <a> تاريخ نشر الاعلان:{{Advertisement.publish_date}}</a>  
+                           
+                        </p>
+                        <div class="explore-person">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <div class="explore-person-img">
+                                            <i class="flaticon-lightbulb-idea"></i>
+                                    </div>
+                                </div>
+                                <div class="col-sm-10">
+                                    <p >
+                                        {{Advertisement.details}}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>			
+                        <div class="explore-open-close-part">
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <button class="close-btn" >{{Advertisement.advertising_state|yesno:"مفعل,ملغي"}}</button>
+                                </div>
+                                <div class="col-sm-7">
+                                    <div class="explore-map-icon">
+                                        <a href="#"><i data-feather="map-pin"></i></a>
+                                        <!--<a herf="#"><i class="bi bi-chat-dots"></i></a>-->
+                                        <a href="#"><i data-feather="heart"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            </div>	
+        </div>
+        </div><!--/.container-->
+        
+    </section><!--/.blog-->
+    <!--blog end -->
+
+		{%endblock%}

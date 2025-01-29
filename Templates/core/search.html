@@ -1,0 +1,71 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-xxl position-relative bg-white d-flex p-0">
+    <!-- Content Start -->
+    <div class="content">
+        <div class="container-fluid pt-4 px-9">
+            <form action="{% url 'see_ads' %}" method="GET">  <!-- Specify method for form submission -->
+
+                <div class="row g-4">
+                    <div class="col-sm-12 col-xl-10">
+                        <div class="bg-light rounded h-100 p-4">
+                            <h5 class="mb-4" style="text-align: center;">اختر الخصائص التى تريد البحث عنها</h5>
+                            <h6 style="text-align: center;">اختر السعر الذي تريدة</h6><br>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" name="max_price" id="max_price" placeholder="أعلى سعر" aria-label="Maximum Price" aria-describedby="basic-addon2">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" name="min_price" id="min_price" placeholder="أقل سعر" aria-label="Minimum Price" aria-describedby="basic-addon2">
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <!-- Number of Rooms -->
+                            <div class="text-center"> 
+                                <h6 class="mb-3">عدد الغرف</h6>
+                                {% for room in unique_rooms %}
+                                <div class="btn-group btn-group-toggle" data-toggle="buttons" style="font-size: 1.2rem;">
+                                    <label class="btn btn-outline-primary active">
+                                        <input type="radio" name="rooms" id="rooms{{ room }}" value="{{ room }}" autocomplete="off"> {{ room }}
+                                    </label>
+                                </div>   
+                                {% endfor %}
+                            </div>
+                             <hr>
+                        <div class="text-center"> 
+                            <h6 class="mb-3">المديريات</h6>
+                            {%for Area in Area%}
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="district"  value="{{Area.ID}}">
+                              <label class="form-check-label" >{{Area.directorate_name}}</label>
+                            </div>
+                            {%endfor%}    
+                        </div>
+                         <hr>
+                         <!-- Features -->
+                         <div class="text-center"> 
+                            <h6 class="mb-3">المميزات</h6>
+                            {% for feature in Feature %}
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" value="{{ feature.feature_name  }}" name="selected_features">
+                                <label class="form-check-label">{{ feature.feature_name }}</label>
+                            </div>
+                        {% endfor %}
+                            
+                         </div>
+                     </div>
+                 </div>
+             </div>
+             <button type="submit"style="font-size:15px;width: 900px;" class="btn btn-primary py-3 mb-4 ">بحث</button>
+         </form>
+     </div>
+ </div>
+</div>
+
+            {% endblock %}
+           

@@ -1,0 +1,59 @@
+{% load static %}
+
+<section class="top-area">
+    <div class="header-area">
+        <!-- Start Navigation -->
+        <nav class="navbar navbar-default bootsnav  navbar-sticky navbar-scrollspy"  data-minus-value-desktop="70" data-minus-value-mobile="55" data-speed="1000">
+
+            <div class="container">
+
+                <!-- Start Header Navigation -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-menu">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <a class="navbar-brand" href="{%  url 'index' %}">Sacan<span>com</span></a>
+
+                </div><!--/.navbar-header-->
+                <!-- End Header Navigation -->
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+               <div class="collapse navbar-collapse menu-ui-design" id="navbar-menu">
+    <ul class="nav navbar-nav navbar-right" data-in="fadeInDown" data-out="fadeOutUp">
+        <li><a href="{% url 'index'%}">الرئيسية</a></li>
+        {% if request.user.is_authenticated %}
+        <li><a href="{% url 'advertiser_app:dashbord'%}">الاعلان في موقعنا</a></li>    
+        {% else %}
+        <li><a href="{% url 'account:adslogin' %}">الاعلان في موقعنا</a></li>
+        {% endif %}
+        
+        <li><a href="{% url 'see_ads' %}">عرض الاعلانات</a></li>
+        <li><a href="{% url 'search' %}"><h3>فلترة الاعلانات</h3></a></li>
+        <li class="nav-item dropdown">
+            <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {% if request.user.is_authenticated %}
+             <i class="far fa-file-alt me-2"></i> {{request.user.username}} </a>
+            <div class="dropdown-menu bg-transparent border-0" aria-labelledby="navbarDropdown">
+                <a href="{% url 'profile_app:profile'  %}" class="dropdown-item"><h3>حسابي الشخصي</h3></a>
+                <a href="{% url 'favorate' %}" class="dropdown-item">الاعلانات المفضلة</a>
+                <a href="{% url 'account:logout' %}" class="dropdown-item">تسجيل الخروج</a>
+            </div>
+            
+            {% else %}
+             <i class="far fa-file-alt me-2"></i> تسجيل الدخول  </a>
+            <div class="dropdown-menu bg-transparent border-0" aria-labelledby="navbarDropdown">
+                <a href="{% url 'account:vistorlogin' %}" class="dropdown-item"><h3> تسجيل الدخول الى حسابي </h3></a>
+                <a href="{% url 'account:usersignup' %}" class="dropdown-item">انشاء حساب</a>
+            </div>
+            {% endif %}
+               
+        </li>
+    </ul><!--/.nav -->
+</div> 
+                            
+                        </div>
+            </div><!--/.container-->
+        </nav><!--/nav-->
+        <!-- End Navigation -->
+    </div><!--/.header-area-->
+</section><!-- /.top-area-->

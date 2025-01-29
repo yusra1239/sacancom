@@ -1,0 +1,317 @@
+{% extends 'advertiser/base.html'%}
+{% load static %}
+        
+    {% block user %}
+        <!-- user data Start -->
+            <h6 class="mb-0">
+                {{request.user.first_name }} {{request.user.last_name}}
+            </h6>
+
+        <!-- user data End --> 
+            {% endblock user %}
+        {% block content %}  
+        <!-- Content Start -->
+
+        <div class="content">
+        {% if is_auth and user is not None %}
+            <!-- Navbar Start -->
+            <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
+                <a href="{% url 'advertiser_app:dashbord' %}" class="navbar-brand d-flex d-lg-none me-4">
+                    <h2 class="text-primary mb-0"><i class="fa fa-hashtag"></i></h2>
+                </a>
+                <a href="#" class="sidebar-toggler flex-shrink-0">
+                    <i class="fa fa-bars"></i>
+                </a>
+                <form class="d-none d-md-flex ms-4">
+                    <input class="form-control border-0" type="search" placeholder="Search">
+                </form>
+                <div class="navbar-nav align-items-center ms-auto">
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fa fa-envelope me-lg-2"></i>
+                            <span class="d-none d-lg-inline-flex">الرسائل</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
+                            <a href="#" class="dropdown-item">
+                                <div class="d-flex align-items-center">
+                                    <img class="rounded-circle" src=" {% static 'img/user.jpg' %}" alt="" style="width: 40px; height: 40px;">
+                                    <div class="ms-2">
+                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>
+                                        <small>15 minutes ago</small>
+                                    </div>
+                                </div>
+                            </a>
+                            <hr class="dropdown-divider">
+                            <a href="#" class="dropdown-item">
+                                <div class="d-flex align-items-center">
+                                    <img class="rounded-circle" src=" {% static 'img/user.jpg' %}" alt="" style="width: 40px; height: 40px;">
+                                    <div class="ms-2">
+                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>
+                                        <small>15 minutes ago</small>
+                                    </div>
+                                </div>
+                            </a>
+                            <hr class="dropdown-divider">
+                            <a href="#" class="dropdown-item">
+                                <div class="d-flex align-items-center">
+                                    <img class="rounded-circle" src=" {% static 'img/user.jpg' %}" alt="" style="width: 40px; height: 40px;">
+                                    <div class="ms-2">
+                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>
+                                        <small>15 minutes ago</small>
+                                    </div>
+                                </div>
+                            </a>
+                            <hr class="dropdown-divider">
+                            <a href="chatting.html" class="dropdown-item text-center">See all message</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fa fa-bell me-lg-2"></i>
+                            <span class="d-none d-lg-inline-flex">الاشعارات</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
+                            <a href="#" class="dropdown-item">
+                                <h6 class="fw-normal mb-0">Profile updated</h6>
+                                <small>15 minutes ago</small>
+                            </a>
+                            <hr class="dropdown-divider">
+                            <a href="#" class="dropdown-item">
+                                <h6 class="fw-normal mb-0">New user added</h6>
+                                <small>15 minutes ago</small>
+                            </a>
+                            <hr class="dropdown-divider">
+                            <a href="#" class="dropdown-item">
+                                <h6 class="fw-normal mb-0">Password changed</h6>
+                                <small>15 minutes ago</small>
+                            </a>
+                            <hr class="dropdown-divider">
+                            <a href="#" class="dropdown-item text-center">See all notifications</a>
+                        </div>
+                    </div>
+                    
+                </div>
+            </nav>
+            <!-- Navbar End -->
+            <div class="container-fluid pt-4 px-4">
+
+            <form  method="POST">
+            {% csrf_token %}
+          
+               {% include "partials/_alert.html" %}
+                 <input name ='user' type='hidden' value='{{ user.ID }}' id='user'>
+                
+                <h6>{{ ad_feature }}</h6>
+                <div class="row g-4">
+                <div class="col-sm-12 col-xl-4">  
+                <div class="bg-light rounded h-100 p-4">
+                <h5 class="mb-4">المميزات التي في عقارك</h5>
+                
+                   
+                    {% for fe  in features %}
+                        {% if ad_feature %}
+                         <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="faetures" value="{{ fe.ID }}" 
+                               {% if fe.ID in ad_feature %} checked {% endif %} id="feature">
+                            <label class="form-check-label" for="faetues">
+                                {{ fe.feature_name }}
+                            </label>
+                        </div>
+                        {% else %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="faeture" value="{{ fe.ID }}" id="feature">
+                            <label class="form-check-label" for="faetures">
+                                {{ fe.feature_name }}
+                            </label>
+                        </div>
+                        {% endif %}
+                     {% endfor %}
+              
+                 </div>
+                </div>
+            <div class="col-sm-12 col-xl-4">
+                <div class="bg-light rounded h-100 p-4">
+                    <h6 class="mb-4">خصائص العقار</h6>
+                   
+                        <fieldset class="row mb-3">
+                            <legend class="col-form-label col-sm-2 pt-0">نوع العقار</legend>
+                            <div class="col-sm-10">
+                            {% for type in r_type %}
+                            {% if ad_realestate %}
+                            
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="realEstate_type" id="realEstate_type"
+                                     value="{{ type.id }}" {% if type.id == ad_realestate.type_id_id %}  checked {% endif %} required>
+                                    <label class="form-check-label" for="realEstate_type">
+                                        {{ type.type }}
+                                    </label>
+                                </div>
+                                
+                                {% endif %}
+                            {% endfor %}
+
+                          
+                            </div>
+                        </fieldset>
+                        <hr>
+                        {% for feature in Feature_gro %}
+                         <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name=" group{{ feature.serial_group }}" id="feature_gro" required >
+                             <label class="form-check-label" for=" group{{ feature.serial_group }}">
+                                {{ feature.feature_name }}
+                            </label>
+                          </div>
+                        {% endfor %}
+
+                 </div>
+            </div>
+            <div class="col-sm-12 col-xl-4">
+                <div class="bg-light rounded h-100 p-4">
+                    <h6 class="mb-4">تفاصل اكثر</h6>
+                    <select class="form-select form-select-sm mb-3" aria-label=".form-select-sm example" name="rooms" >
+                        <option >عدد الغرف</option>
+                        <option {% if ad_realestate.rooms == 1 %} selected {% endif %} value="1">1</option>
+                        <option {% if ad_realestate.rooms == 2 %} selected {% endif %} value="2">2</option>
+                        <option {% if ad_realestate.rooms == 3 %} selected {% endif %} value="3">3</option>
+                        <option {% if ad_realestate.rooms == 4 %} selected {% endif %} value="4">4</option>
+                        <option {% if ad_realestate.rooms == 5 %} selected {% endif %} value="5">5</option>
+
+
+                    </select>
+                    <select class="form-select mb-3" aria-label="Default select example" name="floor">
+                        <option selected>الدور</option>
+                        <option {% if ad_realestate.floor == 1 %} selected {% endif %} value="1">1</option>
+                        <option {% if ad_realestate.floor == 2 %} selected {% endif %} value="2">2</option>
+                        <option {% if ad_realestate.floor == 3 %} selected {% endif %} value="3">3</option>
+                        <option {% if ad_realestate.floor == 4 %} selected {% endif %} value="4">4</option>
+                        <option {% if ad_realestate.floor == 5 %} selected {% endif %} value="5">5</option>
+                    </select>
+                    <select class="form-select mb-3" aria-label="Default select example" name="">
+                        <option selected>السكن</option>
+                        <option value="1">سكني</option>
+                        <option value="2">طبي</option>
+                        
+                    </select>
+
+                    <fieldset class="row mb-3">
+                        <legend class="col-form-label col-sm-2 pt-0">حالته</legend>
+                        <div class="col-sm-10">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="status" id="status" value="1"
+                                {% if ad_data.is_active == True %} checked {% endif %}  required >
+                                <label class="form-check-label" for="status">
+                                   نشط
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="status" id="status" 
+                                {% if ad_data.is_active == False %} checked {% endif %} value="0">
+                                <label class="form-check-label" for="status">
+                                غير نشط
+                                </label>
+                            </div>
+                           
+                        </div>
+                    </fieldset>
+                      <fieldset class="row mb-3">
+                        <legend class="col-form-label col-sm-2 pt-0">الترويج</legend>
+                        <div class="col-sm-10">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="promote" id="p1" 
+                                {% if ad_data.promoted == True %} checked {% endif %}value="1"  >
+                                <label class="form-check-label" for="p1">
+                                   مروج (قد يتطلب دفع)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="promote" id="p2" value="0" 
+                                {% if ad_data.promoted == False %} checked {% endif %} required>
+                                <label class="form-check-label" for="p2">
+                                غير مروج
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                     <div class="col-sm-10">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="rent_or_sell" id="status" 
+                                {% if ad_realestate.rent_or_sell == 2 %} checked {% endif %} value="2"  required>
+                                <label class="form-check-label" for="rent_or_sell">
+                                   بيع
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="rent_or_sell" id="status" 
+                                {% if ad_realestate.rent_or_sell == 1 %} checked {% endif %} value="1">
+                                <label class="form-check-label" for="rent_or_sell">
+                                 ايجار
+                                </label>
+                            </div>
+                           
+                        </div>
+                    </fieldset>
+                    
+                </div>
+            </div>
+            <div class="col-sm-12 col-xl-6">
+                <div class="bg-light rounded h-100 p-4">
+                    <h6 class="mb-4">تابع</h6>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"></span>
+                        <input type="decimel" class="form-control" placeholder="المساحة" 
+                            aria-describedby="basic-addon1" name="space" value="{{ad_realestate.space}}" required >
+                    </div>
+                    
+                    <div class="input-group mb-3">
+                        <input type="number" class="form-control" placeholder="سعر  الذي تريده"
+                            aria-label="Recipient's username" aria-describedby="basic-addon2" value="{{ad_realestate.price}}" name="price" required >
+                        
+                    </div>
+                    
+                    <div class="input-group mb-3">
+                         
+                        <select class="form-select mb-3" aria-label="Default select example" name="address" required >
+                        
+                        {% for address in area %}
+                              <option {% if address.ID ==  ad_data.area_id.ID %} selected {% endif %} value="{{ address.ID }}" >
+                              {{ address.directorate_name }}
+                              </option>                  
+                        {% endfor %}
+                       </select>
+                        
+                    </div>
+
+                    {% comment %}  of images
+                    <div class="input-group">
+                    <input class="form-control" type="file" id="formFile" name="image" required>
+                    </div> {% endcomment %}
+
+                    <br>
+                    <div class="input-group">
+                        <span class="input-group-text">تفاصيل تريد كتابتها</span>
+                        <textarea class="form-control" aria-label="With textarea" value="" name="details">{{ ad_data.details }}</textarea>
+                    </div>
+               
+                </div>
+            </div>
+            <div class="col-sm-12 col-xl-6">
+                <div class="bg-light rounded h-100 p-4">
+                    <iframe class="position-relative rounded w-100 h-100"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3001156.4288297426!2d-78.01371936852176!3d42.72876761954724!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4ccc4bf0f123a5a9%3A0xddcfc6c1de189567!2sNew%20York%2C%20USA!5e0!3m2!1sen!2sbd!4v1603794290143!5m2!1sen!2sbd"
+                    frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false"
+                    tabindex="0"></iframe>
+                </div>
+            </div>
+      </div> 
+              <button type="submit" class="btn btn-primary py-3 w-50 mb-4" name="update" > تحديث </button>
+
+    </form>
+
+     </div>
+      {% else %}
+        <h5> you should <a href="{% url 'account:adslogin'%}"> logined in </a> </h5>
+    {% endif %}
+</div>
+     {% endblock content %}

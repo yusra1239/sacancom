@@ -1,0 +1,300 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+<style>.single-explore-img img:not(:first-child) {
+	display: none;  }
+	.heart-icon {
+        color: gray;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    .heart-icon.favorited {
+        color: red;
+    }
+	
+	</style>
+		<!--welcome-hero start -->
+		<section id="home" class="welcome-hero"style="background-color:write">
+			<div class="container">
+				<div class="welcome-hero-txt">
+					<h2 style="margin-left: 55px;"> الان ابحث عن عقارك <br> والخدمات التي تحتاجها</h2>
+					<p>
+						اكتشف العروض على العقارات والخدمات الان على موقع سكنكم حيث يوفر تجربة مجانية لعرض<br >  مجانا عقارك  او خدماتك الجانبية وتصفح جميع الاعلانات الموجودة في موقعنا		
+     				</p>
+				</div>
+				 
+				<div class="welcome-hero-serch-box">
+					<div class="welcome-hero-form">
+						<div class="row">
+							<div class="welcome-hero-serch">
+								<button class="welcome-hero-btn">
+									<a style="color: aliceblue;" href="#reviews">من نحن  <i data-feather="search"></i> </a>
+								</button>
+							</div>
+						</div>
+						
+							<!-- HTML for the geographic location button -->
+<div class="row">
+    <button class="welcome-hero-btn" id="location-button">
+        الموقع الجغرافي <i data-feather="search"></i>
+    </button>
+</div>
+
+<script>
+    document.getElementById('location-button').addEventListener('click', function() {
+        // Check if geolocation is available
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                // Redirect to see_ads page with the location parameters
+                window.location.href = `see_ads?latitude=${latitude}&longitude=${longitude}`;
+            }, function(error) {
+                alert('Unable to retrieve your location. Please try again.');
+            });
+        } else {
+            alert('Geolocation is not supported by this browser.');
+        }
+    });
+</script>
+
+							<div class="row">
+								<div class="welcome-hero-serch">
+									<button class="welcome-hero-btn">
+										<a style="color: aliceblue;" href="#works">الخدمات  <i data-feather="search"></i> </a>
+									</button>
+							    </div>
+						 </div>
+					</div>					
+				</div>
+			</div>
+		</section>
+		<section id="list-topics" class="list-topics">
+			<div class="container">
+				<form id="filter-form" method="GET" action="{% url 'see_ads' %}" >
+					
+					<div class="list-topics-content">
+						<ul>
+							{%for type in RealEstateType%}
+							<li>
+								<div class="single-list-topics-content">
+									<button type="submit" name="type_name" value="{{ type.id}}">
+										<div class="single-list-topics-icon">
+											<i class="flaticon-building"></i>
+										</div>
+										<p>{{type.type}}</p>
+										<p>{{ type.advertisement_count }} عدد</p>
+									</button>
+								</div>
+							</li>
+							{%endfor%}
+                    	</ul>
+					</div>
+				</form>
+			</div>
+		</section>
+        <section id="explore" class="explore">
+			<div class="container">
+				<div class="section-header">
+					<h2>تصفح الاعلانات</h2>
+					<p>تصفح معنا احدث وافضل العقارات </p>
+				</div>
+				<div class="explore-content">
+					<div class="row">
+						{% for ad_with_rating in ads_with_ratings|slice:':6' %}
+						<div class="col-md-4 col-sm-6">
+							<div class="single-explore-item">
+								<div class="single-explore-img">
+									{% if ad_with_rating.advertisement.RealEstate_id.images.exists %}
+										{% for image in ad_with_rating.advertisement.RealEstate_id.images.all %}
+											{% if image.photo %}
+												<img src="{{ image.photo.url }}" alt="Real Estate Image" style="width: 400px; height: 200px; object-fit: cover;">
+											{% else %}
+												<p>No image available</p>
+											{% endif %}
+										{% endfor %}
+									{% else %}
+										<p>No images available for this advertisement.</p>
+									{% endif %}
+									<div class="single-explore-img-info">
+										<button>{{ ad_with_rating.advertisement.area_id }}</button>
+										<div class="single-explore-image-icon-box">
+											<ul>
+												<li>
+													<a href="{% url 'see_ads_details' ads_id=ad_with_rating.advertisement.ID %}">
+														<div class="single-explore-image-icon">
+															<i class="fa fa-arrows-alt"></i>
+														</div>
+													</a>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<div class="single-explore-txt bg-theme-1">
+									<h2><a href="{% url 'see_ads_details' ads_id=ad_with_rating.advertisement.ID %}">اضغط هنا لرؤية المزيد من التفاصيل</a></h2>
+									<p class="explore-rating-price">
+										التقييم
+										<span class="explore-rating">{{ ad_with_rating.average_rating|default:"0.0" }}</span>
+										<span class="explore-price-box">
+											السعر
+											<span class="explore-price">{{ ad_with_rating.advertisement.RealEstate_id.price }}</span>
+										</span>
+										<a> نوع العقار: {{ ad_with_rating.advertisement.RealEstate_id.type_id }}</a><br>
+										<a>العنوان:</a><br>
+										<a>تاريخ نشر الاعلان : {{ ad_with_rating.advertisement.publish_date }}</a>
+									</p>
+									<div class="explore-person">
+										<div class="row">
+											<div class="col-sm-2">
+												<div class="explore-person-img">
+													<i class="flaticon-lightbulb-idea"></i>
+												</div>
+											</div>
+											<div class="col-sm-10">
+												<p class="text-truncate" dir="rtl">{{ ad_with_rating.advertisement.details }}</p>
+											</div>
+										</div>
+									</div>
+									<div class="explore-open-close-part">
+										<div class="row">
+											<div class="col-sm-5">
+								             {{ ad_with_rating.advertisement.is_active|yesno:"مفعل,ملغي" }}
+
+											</div>
+											<div class="col-sm-7">
+												<div class="explore-map-icon">
+													<a href="https://www.google.com/maps?q={{ ad_with_rating.advertisement.RealEstate_id.attitude}},{{ ad_with_rating.advertisement.RealEstate_id.longitude}}" target="_blank">
+														<i data-feather="map-pin"></i>
+													</a>
+												 
+														<a id="favorite-heart-{{ ad_with_rating.advertisement.ID }}"
+													onclick="toggleFavorite({{ ad_with_rating.advertisement.ID }})">
+													 <i data-feather="heart"
+														class="heart-icon {% if ad_with_rating.advertisement.ID in user_favorite_ids %}favorited{% endif %}">
+													 </i>
+												 </a>
+ 
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</section>
+		<section id="works" class="works">
+			<div class="container ">
+				<div class="section-header">
+					<h2>الخدمات الاضافية</h2>
+					<p>بإمكانك البحث عن الخدمات الاساسية التي قد تحتاجها عن الحصول على عقارك</p>
+				</div>
+				<div class="works-content">
+					<div class="row">
+						{% for service_detail in Services_details %}
+						<div class="col-md-3 col-sm-5">
+							<form action="{% url 'see_servecs' %}" method="GET">
+								<input type="hidden" name="service_id" value="{{ service_detail.ID }}">
+								<div class="single-how-works">
+									<div class="single-how-works-icon">
+										<i class="flaticon-lightbulb-idea"></i>
+									</div>
+									<h2>
+										<a href="javascript:void(0);" onclick="this.closest('form').submit();">{{ service_detail.name }}</a>
+									</h2>
+									<p>
+										{{ service_detail.details }}
+									</p>
+									<button type="submit" class="welcome-hero-btn how-work-btn">
+										معرفة المزيد
+									</button>
+								</div>
+							</form>
+						</div>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</section>
+		
+		<section id="reviews" class="reviews">
+			<div class="section-header">
+				<h2>من نحن</h2>
+		</div>
+			<div class="reviews-content">
+				<div class="testimonial-carousel">
+					{%for about in Aboutus%}
+				    <div class="single-testimonial-box">
+						<div class="testimonial-description">
+							<div class="testimonial-info">
+								<div class="testimonial-person">
+									<h2>{{about.id}}نبذة عامة عننا</h2>
+								</div>
+							</div>
+							<div class="testimonial-comment">
+							<p>
+								{{about.details}}
+							</p>
+							</div>
+						</div>
+					</div>
+					{%endfor%}		 
+				</div>
+			</div>
+		</section>
+		
+		<section id="contact"  class="subscription">
+			<div class="container">
+				<div class="subscribe-title text-center">
+					<h2>
+						do you want to connect with us?
+					</h2>
+					<p>
+					اذا لديك ما تريد اخبارنا به يمكنك التواصل معنا <br>	او تريد الترويج لاعلاناتك اكثر  
+					</p>
+				</div>
+				<div class="container d-flex justify-content-center">
+					<div class="col-sm-12 col-xl-10">
+						<div class="subscription-input-group">
+							<form action="#">
+								
+								<button class="appsLand-btn subscribe-btn" onclick="window.location.href='#'">
+									 تواصل معنا 
+								</button>
+							</form>
+						</div>
+					</div>	
+				</div>
+			</div>
+		</section>
+		
+		<script>
+			function toggleFavorite(adId) {
+				fetch(`/toggle_favorite/${adId}/`, {
+					method: 'POST',
+					headers: {
+						'X-CSRFToken': '{{ csrf_token }}',
+					},
+				})
+				.then(response => response.json())
+				.then(data => {
+					const heartIcon = document.querySelector(`#favorite-heart-${adId} .heart-icon`);
+					if (data.status === 'added') {
+						heartIcon.classList.add('favorited');
+					   
+					} else if (data.status === 'removed') {
+						heartIcon.classList.remove('favorited');
+					   
+					}
+				})
+				.catch(error => console.error('Error:', error));
+			}
+		</script>
+		
+		
+		{% endblock %}

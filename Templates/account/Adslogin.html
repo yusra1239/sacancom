@@ -1,0 +1,47 @@
+{% extends 'account/base.html'%}
+{% load static %}
+
+
+        {% block content %}
+        <!-- Sign In Start -->
+        <div class="container-fluid">
+            <div class="row h-100 align-items-center justify-content-center" style="min-height: 100vh;">
+                <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+                    <div class="bg-light rounded p-4 p-sm-5 my-4 mx-3">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <a href="index.html" class="">
+                                <h3 class="text-primary" style="margin-left: 50px;"></i>SACANCOM</h3>
+                            </a>
+                           
+                        </div>
+                        <p style="text-align: center;">سجل دخول لحسابك للاعلان عن  اعلاناتك</p>
+                        <form method="POST">
+                         {% csrf_token %}
+                         <br>
+                         {% include 'partials\_alert.html' %}
+                        <div class="form-floating mb-4">
+                            <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="username" required value="{{username}}">
+                            <label for="floatingInput">اسم المستخدم</label>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input type="password" class="form-control" id="floatingPassword" placeholder="Password" required name="pass">
+                            <label for="floatingPassword"> كلمة المرور</label>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                            </div>
+                            <a href="">نسيت كلمة السر</a>
+                        </div>
+                        <button type="submit" class="btn btn-primary py-3 w-100 mb-4" name="adslogin">تسجيل دخول</button>
+                        <p class="text-center mb-0" > <span>ليس لدي حساب حالي   </span ><a href="{% url 'account:adsSignup' %}">سجل حساب</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Sign In End -->
+    </div>
+{% endblock content %}

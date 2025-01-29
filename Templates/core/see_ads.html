@@ -1,0 +1,222 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .single-explore-img img:not(:first-child) {
+        display: none;
+    }
+    .heart-icon {
+        color: gray;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    .heart-icon.favorited {
+        color: red;
+    }
+</style>
+
+<section id="explore" class="explore">
+    <div class="container">
+        <div class="section-header">
+            <h2>تصفح الاعلانات</h2>
+            <p>تصفح معنا العديد من العقارات المميزة والتي تلبي احتياجاتك</p>
+        </div>
+        <div class="explore-content">
+            <div class="row">
+                {% for ad_with_rating in page_obj %}
+                <div class="col-md-4 col-sm-6">
+                    <div class="single-explore-item">
+                        <!-- Advertisement Images -->
+                        <div class="single-explore-img">
+                            {% if ad_with_rating.advertisement.RealEstate_id.images.exists %}
+                                {% for image in ad_with_rating.advertisement.RealEstate_id.images.all %}
+                                    {% if image.photo %}
+                                        <img src="{{ image.photo.url }}" alt="Real Estate Image" style="width: 400px; height: 200px; object-fit: cover;">
+                                    {% else %}
+                                        <p>No image available</p>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <p>No images available for this advertisement.</p>
+                            {% endif %}
+                            <div class="single-explore-img-info">
+										<button>{{ ad_with_rating.advertisement.area_id }}</button>
+                                <div class="single-explore-image-icon-box">
+                                    <ul>
+                                        <li>
+                                            <a href="{% url 'see_ads_details' ads_id=ad_with_rating.advertisement.ID %}">
+                                                <div class="single-explore-image-icon">
+                                                    <i class="fa fa-arrows-alt"></i>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Advertisement Details -->
+                        <div class="single-explore-txt bg-theme-1">
+                            <h2>
+                                <a href="{% url 'see_ads_details' ads_id=ad_with_rating.advertisement.ID %}">
+                                    اضغط هنا لرؤية المزيد من التفاصيل
+                                </a>
+                            </h2>
+                            <p class="explore-rating-price">
+                                <!-- Average Rating -->
+                                التقييم:
+                                <span class="explore-rating">
+                                    {{ ad_with_rating.average_rating }}
+                                </span>
+                                <!-- Price -->
+                                <span class="explore-price-box">
+                                    السعر:
+                                    <span class="explore-price">{{ ad_with_rating.advertisement.RealEstate_id.price }}</span>
+                                </span>
+                                <br>
+                                <a>نوع العقار: {{ ad_with_rating.advertisement.RealEstate_id.type_id }}</a><br>
+                                <a>العنوان:</a><br>
+                                <a>تاريخ نشر الاعلان: {{ ad_with_rating.advertisement.publish_date }}</a>
+                            </p>
+
+                            <!-- Advertisement Description -->
+                            <div class="explore-person">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="explore-person-img">
+                                            <i class="flaticon-lightbulb-idea"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <p class="text-truncate" dir="rtl">
+                                            {{ ad_with_rating.advertisement.details }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Advertisement Footer -->
+                            <div class="explore-open-close-part">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <button class="close-btn">
+                                                                                    {{ ad_with_rating.advertisement.is_active|yesno:"مفعل,ملغي" }}
+
+                                        </button>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <div class="explore-map-icon">
+                                            <a href="https://www.google.com/maps?q={{ ad_with_rating.advertisement.RealEstate_id.attitude}},{{ ad_with_rating.advertisement.RealEstate_id.longitude}}" target="_blank">
+                                                <i data-feather="map-pin"></i>
+                                            </a>
+                                         
+                                            <!-- Favorite Button -->
+                                            <a id="favorite-heart-{{ ad_with_rating.advertisement.ID }}"
+                                               onclick="toggleFavorite({{ ad_with_rating.advertisement.ID }})">
+                                                <i data-feather="heart"
+                                                   class="heart-icon {% if ad_with_rating.advertisement.ID in user_favorite_ids %}favorited{% endif %}">
+                                                </i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>لا توجد إعلانات لعرضها.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            <div class="text-center">
+                <div class="pagination">
+                    <span class="step-links">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1">&laquo; الأول</a>
+                            <a href="?page={{ page_obj.previous_page_number }}">الصفحة السابقة</a>
+                        {% endif %}
+                        <span class="current">
+                            الصفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}.
+                        </span>
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}">الصفحة التالية</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}">الأخير &raquo;</a>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- JavaScript for Toggle Favorite -->
+<script>
+    // Function to get query parameters from the URL
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    // Get the directorate_name from the URL
+    const directorate_name = getQueryParam('directorate_name');
+
+    // Function to filter ads based on the directorate_name
+    function filterAds(directorate_name) {
+        // Example: Assuming you have an array of ads
+        const ads = [
+            { id: 1, title: 'Ad 1', directorate: 'الوحدة' },
+            { id: 2, title: 'Ad 2', directorate: 'معين' },
+            { id: 3, title: 'Ad 3', directorate: 'التحرير' },
+            { id: 4, title: 'Ad 4', directorate: 'صنعاء القديمة' },
+            { id: 5, title: 'Ad 5', directorate: 'السبعين' },
+            { id: 6, title: 'Ad 6', directorate: 'ازال' },
+            { id: 7, title: 'Ad 7', directorate: 'الثورة' },
+            { id: 8, title: 'Ad 8', directorate: 'معين' },
+        ];
+
+        // Filter ads based on the directorate_name
+        const filteredAds = ads.filter(ad => ad.directorate === directorate_name);
+
+        // Display the filtered ads (you can modify this part to fit your HTML structure)
+        const adsContainer = document.getElementById('adsContainer');
+        adsContainer.innerHTML = ''; // Clear previous ads
+        filteredAds.forEach(ad => {
+            const adElement = document.createElement('div');
+            adElement.textContent = ad.title; // Customize this as needed
+            adsContainer.appendChild(adElement);
+        });
+    }
+
+    // Call the filter function if directorate_name is present
+    if (directorate_name) {
+        filterAds(directorate_name);
+    }
+</script>
+
+<div id="adsContainer"></div> <!-- Container to display filtered ads -->
+<script>
+    function toggleFavorite(adId) {
+        fetch(`/toggle_favorite/${adId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            const heartIcon = document.querySelector(`#favorite-heart-${adId} .heart-icon`);
+            if (data.status === 'added') {
+                heartIcon.classList.add('favorited');
+               
+            } else if (data.status === 'removed') {
+                heartIcon.classList.remove('favorited');
+               
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+{% endblock %}

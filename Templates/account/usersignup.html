@@ -1,0 +1,73 @@
+{% extends 'account/base.html'%}
+{% load static %}
+        
+        {% block content %}
+    
+        <!-- Sign In Start -->
+        <div class="container-fluid">
+            <div class="row h-100 align-items-center justify-content-center" style="min-height: 100vh;">
+                <div class="col-12 col-sm-8 col-md-3 col-lg-5 col-xl-6">
+                    <div class="bg-light rounded p-4 p-sm-5 my-4 mx-3">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <a href="" class="">
+                            <img class="" color="" src="{% static 'img/image 1.png' %}" alt="" style="width: 40px; height: 40px; filter: hue-rotate(290deg) ;">
+                                <h2 class="text-primary" style="margin-left: 140px;"></i>SACANCOM</h2>
+                            </a>
+                           
+                        </div>
+                        <p style="text-align: center; ">لعرض تفاصيل الاعلانات من الموقع يجب عليك تسجيل الدخول</p>
+                        <hr>
+                        {% include "partials/_alert.html" %}
+                        {% if is_added %}
+                        <form method="POST" style="display: none;">
+
+                        {% else %}
+                        <form method="POST">
+                        {% endif %}
+                        
+                        
+                        {% csrf_token %}
+                        <div class="row">
+                       
+                        
+                        <div class="form-floating col-sm-6 p-1">
+                            <input type="text" class="form-control " id="floatingText" placeholder="Frist Name" required name="fname" value="{{fname}}">
+                            <label for="floatingText">الاسم الاول</label>
+                        </div>
+                        <div class="form-floating col-sm-6 p-1">
+                            <input type="text" class="form-control" id="floatingText" placeholder="Last Name" name="lname" required  value="{{lname}}">
+                            <label for="floatingText">الاسم الاخير</label>
+                        </div>
+                        <div class="form-floating col-sm-6 p-1 ">
+                            <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="username" required value="{{username}}">
+                            <label for="floatingInput">اسم المستخدم</label>
+                        </div>
+                        <div class="form-floating col-sm-6 p-1 ">
+                            <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" name="email" required value="{{email}}">
+                            <label for="floatingInput">البريد الالكتروني</label>
+                        </div>
+                        <div class="form-floating  col-sm-6 p-1">
+                            <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="pass" required  value="{{pass}}">
+                            <label for="floatingPassword"> كلمة المرور</label>
+                        </div>
+                    
+                        <div class="form-floating  col-sm-6 p-1">
+                            <input type="password" class="form-control " id="floatingPassword" placeholder="Password" name="conf_pass" required  value="{{conf_pass}}">
+                            <label for="floatingPassword" >تأكيد كلمة المرور </label>
+                        </div>
+                                               
+                        <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                                <label class="form-check-label" name="rememberme" for="exampleCheck1">Check me out</label>
+                        </div>
+                    </div>
+                    <br>
+
+                        <button type="submit" name="uersignup" class="btn btn-primary py-3 w-100 mb-5 p-4">إنشاء حساب</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Sign In End -->
+   {% endblock content %}
