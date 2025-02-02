@@ -19,6 +19,7 @@
 				<div class="welcome-hero-txt">
 					<h2 style="margin-left: 55px;"> الان ابحث عن عقارك <br> والخدمات التي تحتاجها</h2>
 					<p>
+						
 						اكتشف العروض على العقارات والخدمات الان على موقع سكنكم حيث يوفر تجربة مجانية لعرض<br >  مجانا عقارك  او خدماتك الجانبية وتصفح جميع الاعلانات الموجودة في موقعنا		
      				</p>
 				</div>
@@ -34,31 +35,13 @@
 						</div>
 						
 							<!-- HTML for the geographic location button -->
-<div class="row">
-    <button class="welcome-hero-btn" id="location-button">
-        الموقع الجغرافي <i data-feather="search"></i>
-    </button>
-</div>
-
-<script>
-    document.getElementById('location-button').addEventListener('click', function() {
-        // Check if geolocation is available
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-
-                // Redirect to see_ads page with the location parameters
-                window.location.href = `see_ads?latitude=${latitude}&longitude=${longitude}`;
-            }, function(error) {
-                alert('Unable to retrieve your location. Please try again.');
-            });
-        } else {
-            alert('Geolocation is not supported by this browser.');
-        }
-    });
-</script>
-
+							<div class="row">
+								<button class="welcome-hero-btn" id="location-button">
+									الموقع الجغرافي <i data-feather="search"></i>
+								</button>
+							</div>
+							
+							
 							<div class="row">
 								<div class="welcome-hero-serch">
 									<button class="welcome-hero-btn">
@@ -141,7 +124,6 @@
 											السعر
 											<span class="explore-price">{{ ad_with_rating.advertisement.RealEstate_id.price }}</span>
 										</span>
-										<a> نوع العقار: {{ ad_with_rating.advertisement.RealEstate_id.type_id }}</a><br>
 										<a>العنوان:</a><br>
 										<a>تاريخ نشر الاعلان : {{ ad_with_rating.advertisement.publish_date }}</a>
 									</p>
@@ -247,6 +229,76 @@
 				</div>
 			</div>
 		</section>
+		<section id="explore" class="explore">
+			<div class="container">
+				<div class="section-header">
+					<h2>إعلانات مقترحة</h2>
+				</div>
+				<div class="explore-content">
+					<div class="row">
+						{% for ad_with_rating in recommended_ads %}
+						<div class="col-md-4 col-sm-6">
+							<div class="single-explore-item">
+								<div class="single-explore-img">
+									{% if ad_with_rating.advertisement.RealEstate_id.images.exists %}
+										{% for image in ad_with_rating.advertisement.RealEstate_id.images.all %}
+											{% if image.photo %}
+												<img src="{{ image.photo.url }}" alt="Real Estate Image" style="width: 400px; height: 200px; object-fit: cover;">
+											{% endif %}
+										{% endfor %}
+									{% else %}
+										<p>No images available for this advertisement.</p>
+									{% endif %}
+									<div class="single-explore-img-info">
+										<button>{{ ad_with_rating.advertisement.area_id }}</button>
+										<div class="single-explore-image-icon-box">
+											<ul>
+												<li>
+													<a href="{% url 'see_ads_details' ads_id=ad_with_rating.advertisement.ID %}">
+														<div class="single-explore-image-icon">
+															<i class="fa fa-arrows-alt"></i>
+														</div>
+													</a>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<div class="single-explore-txt bg-theme-1">
+									<h2>
+										<a href="{% url 'see_ads_details' ads_id=ad_with_rating.advertisement.ID %}">
+											اضغط هنا لرؤية المزيد من التفاصيل
+										</a>
+									</h2>
+									<p class="explore-rating-price">
+										التقييم
+										<span class="explore-rating">{{ ad_with_rating.average_rating|default:"0.0" }}</span>
+										<span class="explore-price-box">
+											السعر
+											<span class="explore-price">{{ ad_with_rating.advertisement.RealEstate_id.price }}</span>
+										</span>
+
+										<a>تاريخ نشر الإعلان: {{ ad_with_rating.advertisement.publish_date }}</a>
+									</p>
+									<div class="explore-map-icon">
+										<a href="https://www.google.com/maps?q={{ ad_with_rating.advertisement.RealEstate_id.attitude}},{{ ad_with_rating.advertisement.RealEstate_id.longitude}}" target="_blank">
+											<i data-feather="map-pin"></i>
+										</a>
+										<a id="favorite-heart-{{ ad_with_rating.advertisement.ID }}"
+										   onclick="toggleFavorite({{ ad_with_rating.advertisement.ID }})">
+											<i data-feather="heart"
+											   class="heart-icon {% if ad_with_rating.advertisement.ID in user_favorite_ids %}favorited{% endif %}">
+											</i>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</section>
 		
 		<section id="contact"  class="subscription">
 			<div class="container">
@@ -295,6 +347,21 @@
 				.catch(error => console.error('Error:', error));
 			}
 		</script>
-		
+		<script>
+			document.getElementById('location-button').addEventListener('click', function() {
+				if (navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(function(position) {
+						const latitude = position.coords.latitude;
+						const longitude = position.coords.longitude;
+						window.location.href = `see_ads?latitude=${latitude}&longitude=${longitude}`;
+					}, function(error) {
+						alert('Unable to retrieve your location. Please try again.');
+					});
+				} else {
+					alert('Geolocation is not supported by this browser.');
+				}
+			});
+		</script>
+
 		
 		{% endblock %}

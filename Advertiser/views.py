@@ -1,5 +1,4 @@
 from django.shortcuts import get_object_or_404, render , redirect
-# Create your views here.
 from django.contrib import messages
 from django.http import Http404
 from .models import Feature , RealEstateType, Area, Advertisement , Advertiser
@@ -60,111 +59,78 @@ def dashbord(request):
             }
     
     return render(request,"advertiser/dashbord.html", context)
+from django.shortcuts import redirect
+from django.urls import reverse
 
 def form_ads(request):
     if request.user.is_authenticated:
         user = request.user
         ad_id = Advertiser.objects.get(user_ID=user.id)
-        
-        feature = []
-        type_id = None
-        status = None
-        promote = None
-        r_or_s = None
-        space = None
-        price = None
-        address = None
-        details = None
-        user = None
-        source = AdsSource.objects.get(ID=1)
 
         if request.method == 'POST' and 'save' in request.POST:
+            # Extract data from the form
             user = request.POST.get('user')
             feature = request.POST.getlist('features')
             type_id = request.POST.get('realEstate_type')
             status = request.POST.get('status')
-            promote = request.POST.get('promote')
+            promote = request.POST.get('promote') == '1'  # Check if promoted
             r_or_s = request.POST.get('rent_or_sell')
             space = request.POST.get('space')
             price = request.POST.get('price')
             address = request.POST.get('address')
-            img_files = request.FILES.getlist('image')  
+            img_files = request.FILES.getlist('image')
             details = request.POST.get('details')
 
-            errors = []
-            if not user:
-                errors.append('يرجى اختيار المستخدم.')
-            if not type_id:
-                errors.append('يرجى اختيار نوع العقار.')
-            if not status:
-                errors.append('يرجى اختيار حالة الإعلان.')
-            if not promote:
-                errors.append('يرجى اختيار خيار الترويج.')
-            if not r_or_s:
-                errors.append('يرجى اختيار خيار البيع أو الإيجار.')
-            if not space:
-                errors.append('يرجى إدخال مساحة العقار.')
-            if not price:
-                errors.append('يرجى إدخال السعر.')
-            if not address:
-                errors.append('يرجى اختيار العنوان.')
-            if not img_files:
-                errors.append('يرجى تحميل صورة واحدة على الأقل.')
+            # Save the advertisement
+            try:
+                user_obj = Advertiser.objects.get(ID=user)
+                type_obj = RealEstateType.objects.get(id=type_id)
+                address_obj = Area.objects.get(ID=address)
 
-            if errors:
-                for error in errors:
-                    messages.error(request, error)
-            else:
-                try:
-                    user_obj = Advertiser.objects.get(ID=user)
-                    type_obj = RealEstateType.objects.get(id=type_id)
-                    address_obj = Area.objects.get(ID=address)
+                # Create RealEstate instance
+                realestate = RealEstate(
+                    type_id=type_obj,
+                    space=space,
+                    price=price,
+                    rent_or_sell=r_or_s,
+                    # Add latitude and longitude if needed
+                )
+                realestate.save()
 
-                    # الحصول على الإحداثيات من العنوان
-                    coordinates = get_coordinates(address_obj.name)  
-                    if coordinates:
-                        latitude, longitude = coordinates
-                    else:
-                        messages.error(request, 'تعذر العثور على الموقع الجغرافي. يرجى إدخال عنوان أكثر دقة.')
-                        return render(request, "advertiser/form_ads.html", context)
+                # Create Advertisement instance
+                ads = Advertisement(
+                    source=AdsSource.objects.get(ID=1),
+                    advertiser_id=user_obj,
+                    area_id=address_obj,
+                    RealEstate_id=realestate,
+                    is_active=status,  # Use the correct field name here
+                    details=details,
+                    promoted=promote,
+                )
+                ads.save()
 
-                    # إنشاء كائن RealEstate
-                    realestate = RealEstate(
-                        type_id=type_obj,
-                        longitude=longitude,  
-                        attitude=latitude,  
-                        space=space,
-                        price=price,
-                        rent_or_sell=r_or_s
-                    )
-                    realestate.save()
+                # Save images
+                for img in img_files:
+                    realEstateImage = RealEstateImage(RealEstate_id=realestate, photo=img)
+                    realEstateImage.save()
 
-                    # إنشاء الإعلان
-                    ads = Advertisement(
-                        source=source,
-                        advertiser_id=user_obj,
-                        RealEstate_id=realestate,
-                        is_active=status,
-                        details=details,
-                        promoted=promote,
-                        area_id=address_obj,
-                    )
-                    ads.save()
+                # Save features
+                for feature_id in feature:
+                    fe = Feature.objects.get(ID=feature_id)
+                    RealEstate_Feature.objects.create(feature_ID=fe, realEstate_ID=realestate)
 
-                    # حفظ الصور
-                    for img in img_files:
-                        realEstateImage = RealEstateImage(RealEstate_id=realestate, photo=img)
-                        realEstateImage.save()
+                messages.success(request, 'تم إضافة الإعلان بنجاح')
 
-                    # حفظ الميزات
-                    for feature_id in feature:
-                        fe = Feature.objects.get(ID=feature_id)
-                        f = RealEstate_Feature(feature_ID=fe, realEstate_ID=realestate)
-                        f.save()
+                if promote:
+                    # Redirect to payment page if promoted
+                    return redirect(reverse('account:payment') + f'?ad_id={ads.ID}')
+                else:
+                    # Return success response for non-promoted
+                    return JsonResponse({'success': True})
 
-                    messages.success(request, 'تم إضافة الإعلان بنجاح')
-                except Exception as e:
-                    messages.error(request, f'خطأ: {str(e)}')
+            except Exception as e:
+                messages.error(request, f'خطأ: {str(e)}')
+                return JsonResponse({'success': False, 'error': str(e)})
 
     context = {
         'user': ad_id,
@@ -172,11 +138,8 @@ def form_ads(request):
         'Feature_gro': Feature.objects.filter(serial_group__gt=0).order_by('serial_group'),
         'r_type': RealEstateType.objects.all(),
         'area': Area.objects.all(),
-        'try': feature,
     }
     return render(request, "advertiser/form_ads.html", context)
-
-
 def form_ads2(request):
     if request.user.is_authenticated:
         u = request.user

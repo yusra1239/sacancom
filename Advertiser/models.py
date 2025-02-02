@@ -2,7 +2,7 @@ from django.db import models
 from datetime import datetime
 from django.db.models import Avg
 from django.contrib.auth.models import User
-
+# from creditcards.models import CardNumberField,CardExpiryField,SecurityCodeField
 class Rules(models.Model):
     ID= models.AutoField(primary_key=True)
     rule_name= models.CharField(max_length=20)
@@ -34,7 +34,7 @@ class Advertiser(models.Model):
     ID = models.AutoField(primary_key=True)
     phone_num = models.CharField(max_length=13)
     status = models.BooleanField(default=False)
-    ID_number = models.IntegerField(max_length=11)
+    ID_number = models.IntegerField()
     def __str__(self):
         return f"Advertiser ID: {self.ID}"
     class Meta:
@@ -140,7 +140,7 @@ class RealEstateImage(models.Model):
 
 
 class Rating(models.Model):
-    advertisement = models.OneToOneField(Advertisement, on_delete=models.CASCADE)
+    advertisement = models.ForeignKey(Advertisement, on_delete=models.CASCADE)  
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     stars = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)])  # 1 to 5 stars
     created_at = models.DateTimeField(auto_now_add=True)
@@ -172,3 +172,15 @@ class Profile(models.Model):
         return self.user.username
     class Meta:
         db_table = 'Profile'    
+
+
+class AdRecommendation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # المستخدم الذي تم التوصية له
+    advertisement = models.ForeignKey(Advertisement, on_delete=models.CASCADE)  # الإعلان الموصى به
+    score = models.FloatField(default=0.0)  # درجة التوصية (اختياري حسب الخوارزمية)
+    created_at = models.DateTimeField(auto_now_add=True)  # وقت التوصية
+
+    def __str__(self):
+        return f"Recommendation for {self.user} - {self.advertisement}"
+class Meta:
+        db_table = 'AdRecommendation' 

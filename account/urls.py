@@ -10,4 +10,6 @@ urlpatterns = [
     path('profile <str:username>', views.profile, name='profile'),
     path('vistorlogin', views.vistorlogin, name='vistorlogin'),
     path('logout', views.logout, name='logout'),
+    path('payment', views.payment , name='payment'),
+    path("save_card/",views.save_card, name="save_card"),
 ]

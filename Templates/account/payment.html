@@ -1,0 +1,58 @@
+{% extends 'account/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- الدفع Start -->
+<div class="container-fluid">
+    <div class="row h-100 align-items-center justify-content-center" style="min-height: 100vh;">
+        <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-6">
+            <div class="bg-light rounded p-4 p-sm-5 my-4 mx-3">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h2 class="text-primary text-center w-100">SACANCOM </h2>
+                    <a href="{% url 'advertiser_app:form_ads'%}" class="btn btn-primary m-1 "> رجوع </a>
+                </div>
+                <p>رقم الاعلان : {{ ad.id }}</p>
+
+                <p class="text-center">تكلفة ترويج إعلانك 1000</p>
+
+                {% if not request.user.is_authenticated or request.user.is_anonymous %}
+                <h5 class="alert alert-warning text-center">
+                    يجب عليك <a href="{% url 'account:adslogin' %}" class="text-dark">تسجيل الدخول</a> للمتابعة
+                </h5>
+                {% else %}
+
+                <form method="POST">
+                    {% csrf_token %}
+                    {% include "partials/_alert.html" %}
+
+                    <div class="row">
+                        <div class="form-floating col-sm-6 p-1">
+                            <input type="tel" class="form-control" id="phonenumber" name="phone_num" placeholder="رقم الهاتف" required>
+                            <label for="phonenumber">رقم الهاتف</label>
+                        </div>
+                        <div class="form-floating col-sm-6 p-1">
+                            <input type="text" class="form-control" id="card_number" name="card_number" placeholder="3333 3333 3333" required>
+                            <label for="card_number">رقم البطاقة</label>
+                        </div>
+                        <div class="form-floating col-sm-6 p-1">
+                            <input type="text" class="form-control" id="expire" name="expire" placeholder="MM/YY" required>
+                            <label for="expire">تاريخ الانتهاء (MM/YY)</label>
+                        </div>
+                        <div class="form-floating col-sm-6 p-1">
+                            <input type="password" class="form-control" id="security_code" name="security_code" placeholder="CVV" maxlength="4" required>
+                            <label for="security_code">رمز الأمان</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary py-3 w-100 mt-3">ادفع الآن</button>
+                </form>
+
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<!-- الدفع End -->
+
+{% endblock content %}

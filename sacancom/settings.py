@@ -13,10 +13,29 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
+from cryptography.fernet import Fernet
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+
+# تحديد المسار لحفظ مفتاح التشفير
+SECRET_KEY_PATH = os.path.join(BASE_DIR, "secret.key")
+
+# توليد مفتاح جديد وحفظه فقط إذا لم يكن موجودًا
+if not os.path.exists(SECRET_KEY_PATH):
+    with open(SECRET_KEY_PATH, "wb") as key_file:
+        key_file.write(Fernet.generate_key())
+
+# قراءة مفتاح التشفير من الملف
+with open(SECRET_KEY_PATH, "rb") as key_file:
+    ENCRYPTION_KEY = key_file.read()
+
+# إنشاء كائن التشفير باستخدام المفتاح
+FERNET = Fernet(ENCRYPTION_KEY)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -90,10 +109,13 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sacancom2',
-        'USER':'root',
-        'PASSWORD':'',
-        'HOST':'localhost',
-        'PORT':''
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '',  # تمت إضافة فاصلة هنا
+        'OPTIONS': {
+            'sql_mode': 'STRICT_ALL_TABLES',  # تفعيل الوضع الصارم
+        },  # تمت إضافة فاصلة هنا
     }
 }
 
