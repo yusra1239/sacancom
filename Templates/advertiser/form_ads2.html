@@ -94,7 +94,7 @@
             </nav>
             <!-- Navbar End -->
             <div class="container-fluid pt-4 px-4">
-               <form method="POST">
+               <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
              {% include "partials/_alert.html" %}
 
@@ -105,24 +105,18 @@
                     <div class="col-sm-12 col-xl-6">
                         <div class="bg-light rounded h-100 p-4">
                             <h6 class="mb-4">خصائص الاعلان</h6>
-                           
+                           {{service_id}}
                                 <fieldset class="row mb-3">
                                     <legend class="col-form-label col-sm-2 pt-0">نوع الاعلان</legend>
                                     <div class="col-sm-10">
                                     {% for service in service_de %}
                                        <div class="form-check">
-                                       {% if service_id %}
                                             <input class="form-check-input" type="radio" name="service"
-                                                id="service" value="{{ service_id }}" checked>
-                                        {% else %}
-                                            <input class="form-check-input" type="radio" name="service"
-                                                id="service" value="{{ service.ID }}" >   
-                                        {% endif %}
+                                                id="service" value="{{service.ID}}" {% if service.ID == service_id %} checked {% endif %}>
                                             <label class="form-check-label" for="service">
                                                 {{service.name}}
                                             </label>
                                         </div>
-                                        
                                     {% endfor %}
                                     <br>  
                                     </div>
@@ -198,64 +192,22 @@
                                 
                                  </fieldset>
                                 <hr>
+                                <h2>{{ address_id }}</h2>
                         <select class="form-select mb-3" aria-label="Default select example" name="address">
                         <label> <option value="{{ address.ID }}" selected>العنوان </option> </label>
-                        {% for address in area %}
-                            {% if address_id %}
-                                    <option value="{{ address_id }}" selected>
-                                        {{ address.directorate_name }}
-                                    </option>  
-                                {% else %}
-                                    <option value="{{ address.ID }}">
-                                        {{ address.directorate_name }}    
-                                    </option>  
-                                {% endif %}                
-                        {% endfor %}
-                       </select>
+                            {% for address in area %}
+                                <option {% if address.ID == address_id %} selected {% endif %} value="{{ address.ID }}" >
+                                {{ address.directorate_name }}
+                                </option>                  
+                            {% endfor %}
+                        </select>
 
                                 <div class="input-group">
                                     <span class="input-group-text">تفاصيل تريد كتابتها</span>
                                     <textarea class="form-control" aria-label="With textarea" name="details" value="{{ details }}"></textarea>              
                                  </div>      
                             <hr>
-                        <fieldset class="row mb-3">
-                        <legend class="col-form-label col-sm-2 pt-0">الترويج</legend>
-                        {% if promoted == True %}
-                                 <div class="col-sm-10">
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="promote"
-                                        id="p1" value="True" checked>
-                                    <label class="form-check-label" for="p1">
-                                   مروج (قد يتطلب دفع)
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                <input class="form-check-input" type="radio" name="promote"
-                                    id="p2" value="False">
-                                <label class="form-check-label" for="p2" >
-                                غير مروج
-                                </label>
-                            </div>
-                        </div>
-                            {% else %}
-                                <div class="col-sm-10">
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="promote"
-                                        id="p1" value="True">
-                                    <label class="form-check-label" for="p1">
-                                   مروج (قد يتطلب دفع)
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                <input class="form-check-input" type="radio" name="promote"
-                                    id="p2" value="False" checked>
-                                <label class="form-check-label" for="p2" >
-                                غير مروج
-                                </label>
-                            </div>
-                        </div>
-                            {% endif %}
-                    </fieldset>
+                        
                         </div>
                     </div>
                 </div>

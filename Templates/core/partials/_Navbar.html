@@ -34,7 +34,11 @@
             {% if request.user.is_authenticated %}
              <i class="far fa-file-alt me-2"></i> {{request.user.username}} </a>
             <div class="dropdown-menu bg-transparent border-0" aria-labelledby="navbarDropdown">
-                <a href="{% url 'profile_app:profile'  %}" class="dropdown-item"><h3>حسابي الشخصي</h3></a>
+                {% if request.user.profile.is_advertiser %}
+                <a href="{% url 'profile:ad_profile' %}"class="dropdown-item"><h3>حسابي الشخصي</h3></a>
+                {% else%}
+                <a href="{% url 'profile:profile' %}" class="dropdown-item"><h3>حسابي الشخصي</h3></a>
+                {% endif %}
                 <a href="{% url 'favorate' %}" class="dropdown-item">الاعلانات المفضلة</a>
                 <a href="{% url 'account:logout' %}" class="dropdown-item">تسجيل الخروج</a>
             </div>

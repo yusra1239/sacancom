@@ -121,15 +121,11 @@
                                                 {{service.name}}
                                             </label>
                                         </div> 
-                                       
-                                    
                                     {% endfor %}
                                     <br>  
-                                    </div>
-                                    <br>
-                                    
+                                </div>
+                                </fieldset>
                                 <hr>
-                                
                      <fieldset class="row mb-3">
                         <legend class="col-form-label col-sm-2 pt-0">حالته</legend>
                         <div class="col-sm-10">
@@ -178,26 +174,7 @@
                                     <textarea class="form-control" aria-label="With textarea" name="details" value="{{ ad.details }}"> {{ ad.details }} </textarea>              
                                  </div>      
                             <hr>
-                         <fieldset class="row mb-3">
-                        <legend class="col-form-label col-sm-2 pt-0">الترويج</legend>
-                        <div class="col-sm-10">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="promote" id="p1" 
-                                {% if ad.promoted == True %} checked {% endif %}value="1"  >
-                                <label class="form-check-label" for="p1">
-                                   مروج (قد يتطلب دفع)
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="promote" id="p2" value="0" 
-                                {% if ad.promoted == False %} checked {% endif %} required>
-                                <label class="form-check-label" for="p2">
-                                غير مروج
-                                </label>
-                            </div>
-                        </div>
-                    </fieldset>
-
+                         
                         </div>
                     </div>
                 </div>

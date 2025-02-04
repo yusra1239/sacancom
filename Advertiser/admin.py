@@ -9,7 +9,6 @@ from .models import Feature
 from .models import RealEstate_Feature
 from .models import RealEstateImage
 from .models import Services_details
-from .models import Rules
 from .models import Advertiser
 from .models import Rating
 
@@ -24,6 +23,5 @@ admin.site.register(RealEstate_Feature)
 admin.site.register(RealEstateImage)
 admin.site.register(Services_details)
 admin.site.register(Advertiser)
-admin.site.register(Rules)
 admin.site.register(Rating)
 

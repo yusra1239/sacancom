@@ -3,14 +3,7 @@ from datetime import datetime
 from django.db.models import Avg
 from django.contrib.auth.models import User
 # from creditcards.models import CardNumberField,CardExpiryField,SecurityCodeField
-class Rules(models.Model):
-    ID= models.AutoField(primary_key=True)
-    rule_name= models.CharField(max_length=20)
-    class Meta:
-        db_table ='Rules'
 
-    def __str__(self):
-        return self.rule_name
     
 class AdsSource(models.Model):
     ID = models.AutoField(primary_key=True)
@@ -162,25 +155,17 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"{self.user.username} favorited {self.advertisement}"
-
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.CharField(blank=True, default=':)', max_length=355)
-    profile_image = models.ImageField(default='default.png', upload_to='profile_pics')
+    profile_image = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    is_advertiser=models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.user.username
     class Meta:
         db_table = 'Profile'    
+ 
 
 
-class AdRecommendation(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # المستخدم الذي تم التوصية له
-    advertisement = models.ForeignKey(Advertisement, on_delete=models.CASCADE)  # الإعلان الموصى به
-    score = models.FloatField(default=0.0)  # درجة التوصية (اختياري حسب الخوارزمية)
-    created_at = models.DateTimeField(auto_now_add=True)  # وقت التوصية
 
-    def __str__(self):
-        return f"Recommendation for {self.user} - {self.advertisement}"
-class Meta:
-        db_table = 'AdRecommendation' 

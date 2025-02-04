@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, render , redirect
+# Create your views here.
 from django.contrib import messages
 from django.http import Http404
 from .models import Feature , RealEstateType, Area, Advertisement , Advertiser
@@ -8,29 +9,7 @@ from .models import AdsSource
 from django.contrib.auth.models import User
 from django.contrib import auth
 from datetime import date
-from geopy.geocoders import Nominatim
-from geopy.geocoders import Nominatim
-from time import sleep
-def get_coordinates(address):
-    geolocator = Nominatim(user_agent="my_real_estate_app")
-    try:
-        location = geolocator.geocode(address, timeout=10)
-        if location:
-            return location.latitude, location.longitude
-        else:
-            print("العنوان غير متاح")
-            return None
-    except Exception as e:
-        print(f"خطأ في تحديد الموقع: {e}")
-        return None
 
-# تجربة العنوان
-address = "Riyadh, Saudi Arabia"
-coords = get_coordinates(address)
-if coords:
-    print("الإحداثيات:", coords)
-else:
-    print("فشل في جلب الإحداثيات")
 
 
 def dashbord(request):
@@ -59,87 +38,120 @@ def dashbord(request):
             }
     
     return render(request,"advertiser/dashbord.html", context)
-from django.shortcuts import redirect
-from django.urls import reverse
 
 def form_ads(request):
     if request.user.is_authenticated:
         user = request.user
-        ad_id = Advertiser.objects.get(user_ID=user.id)
+        ad_id = Advertiser.objects.get(user_ID = user.id)
+       
+        feature = []
+        type_id = None
+        rooms = None
+        floor = None
+        status = None
+        promote = None
+        r_or_s = None
+        space = None
+        price = None
+        address = None
+        details = None
+        user = None
+        source = AdsSource.objects.get(ID=1)
 
         if request.method == 'POST' and 'save' in request.POST:
-            # Extract data from the form
             user = request.POST.get('user')
             feature = request.POST.getlist('features')
             type_id = request.POST.get('realEstate_type')
             status = request.POST.get('status')
-            promote = request.POST.get('promote') == '1'  # Check if promoted
+            promote = request.POST.get('promote')
             r_or_s = request.POST.get('rent_or_sell')
             space = request.POST.get('space')
             price = request.POST.get('price')
             address = request.POST.get('address')
-            img_files = request.FILES.getlist('image')
+            img_files = request.FILES.getlist('image')  # Get the list of uploaded files
             details = request.POST.get('details')
 
-            # Save the advertisement
-            try:
-                user_obj = Advertiser.objects.get(ID=user)
-                type_obj = RealEstateType.objects.get(id=type_id)
-                address_obj = Area.objects.get(ID=address)
+            # Collect errors
+            errors = []
 
-                # Create RealEstate instance
-                realestate = RealEstate(
-                    type_id=type_obj,
-                    space=space,
-                    price=price,
-                    rent_or_sell=r_or_s,
-                    # Add latitude and longitude if needed
-                )
-                realestate.save()
+            if not user:
+                errors.append('يرجى اختيار المستخدم.')
+            if not type_id:
+                errors.append('يرجى اختيار نوع العقار.')
+            if not status:
+                errors.append('يرجى اختيار حالة الإعلان.')
+            if not promote:
+                errors.append('يرجى اختيار خيار الترويج.')
+            if not r_or_s:
+                errors.append('يرجى اختيار خيار البيع أو الإيجار.')
+            if not space:
+                errors.append('يرجى إدخال مساحة العقار.')
+            if not price:
+                errors.append('يرجى إدخال السعر.')
+            if not address:
+                errors.append('يرجى اختيار العنوان.')
+            if not img_files:
+                errors.append('يرجى تحميل صورة واحدة على الأقل.')
 
-                # Create Advertisement instance
-                ads = Advertisement(
-                    source=AdsSource.objects.get(ID=1),
-                    advertiser_id=user_obj,
-                    area_id=address_obj,
-                    RealEstate_id=realestate,
-                    is_active=status,  # Use the correct field name here
-                    details=details,
-                    promoted=promote,
-                )
-                ads.save()
+            if errors:
+                for error in errors:
+                    messages.error(request, error)
+            else:
+                try:
+                    user_obj = Advertiser.objects.get(ID=user)
+                    type_obj = RealEstateType.objects.get(id=type_id)
+                    address_obj = Area.objects.get(ID=address)
+                    # Create RealEstate instance
 
-                # Save images
-                for img in img_files:
-                    realEstateImage = RealEstateImage(RealEstate_id=realestate, photo=img)
-                    realEstateImage.save()
+                    realestate = RealEstate(
+                        type_id=type_obj,   
+                        longitude=request.POST['longitude'],  
+                        attitude=request.POST['latitude'],  
+                        space=space,
+                        price=price,
+                        rooms=rooms,
+                        floor=floor,
+                        rent_or_sell=r_or_s
+                    )
+                    realestate.save()
 
-                # Save features
-                for feature_id in feature:
-                    fe = Feature.objects.get(ID=feature_id)
-                    RealEstate_Feature.objects.create(feature_ID=fe, realEstate_ID=realestate)
+                    # Create Advertisement instance
+                    ads = Advertisement(
+                        source=source,
+                        advertiser_id=user_obj,
+                        RealEstate_id=realestate,
+                        is_active=status,
+                        details=details,
+                        promoted=promote,
+                        area_id=address_obj,
+                    )
+                    ads.save()
+                    
+                    # Save each image
+                    for img in img_files:
+                        realEstateImage = RealEstateImage(RealEstate_id=realestate, photo=img)
+                        realEstateImage.save()
+                
 
-                messages.success(request, 'تم إضافة الإعلان بنجاح')
+                    for feature_id in feature:
+                        fe=Feature.objects.get(ID=feature_id)
+                        f=RealEstate_Feature( feature_ID = fe , realEstate_ID= realestate)
+                        f.save()
 
-                if promote:
-                    # Redirect to payment page if promoted
-                    return redirect(reverse('account:payment') + f'?ad_id={ads.ID}')
-                else:
-                    # Return success response for non-promoted
-                    return JsonResponse({'success': True})
-
-            except Exception as e:
-                messages.error(request, f'خطأ: {str(e)}')
-                return JsonResponse({'success': False, 'error': str(e)})
+                    messages.success(request, 'تم اضافة الاعلان بنجاح')
+                except Exception as e:
+                    messages.error(request, f'خطأ: {str(e)}')
 
     context = {
-        'user': ad_id,
-        'features': Feature.objects.filter(serial_group=0),
-        'Feature_gro': Feature.objects.filter(serial_group__gt=0).order_by('serial_group'),
-        'r_type': RealEstateType.objects.all(),
-        'area': Area.objects.all(),
-    }
+            'user':ad_id,
+            'features': Feature.objects.filter(serial_group=0),
+            'Feature_gro': Feature.objects.filter(serial_group__gt=0).order_by('serial_group'),
+            'r_type': RealEstateType.objects.all(),
+            'area': Area.objects.all(),
+            'try':feature,
+        }
     return render(request, "advertiser/form_ads.html", context)
+
 def form_ads2(request):
     if request.user.is_authenticated:
         u = request.user
@@ -155,7 +167,6 @@ def form_ads2(request):
         status=None
         address_id=None
         details=None
-        promoted=None
         user=None
         source_obj= AdsSource.objects.get(ID=2)
         is_added= None
@@ -182,15 +193,10 @@ def form_ads2(request):
             else:
                 messages.error(request, 'خطأ في حالة الاعلان')
 
-            if 'promote' in request.POST:
-                promoted= request.POST['promote']
-            else:
-                messages.error(request, 'خطأ في ترويج الاعلان')
-
             if 'details' in request.POST:
                 details= request.POST['details']
 
-            if user and service_id and address_id and status and promoted:           
+            if user and service_id and address_id and status:           
                 try:
                     user_obj = Advertiser.objects.get(ID=user)
                 except Advertiser.DoesNotExist:
@@ -199,12 +205,12 @@ def form_ads2(request):
                 try:
                     service_obj = Services_details.objects.get(ID=service_id)
                 except Services_details.DoesNotExist:
-                        messages.error(request,'ERROR in service !! ')
+                        messages.error(request,'خطأ في الخدمات')
                         service_obj = None
                 try:
                     address_obj = Area.objects.get(ID = address_id)
                 except Area.DoesNotExist:
-                        messages.error(request,'ERROR in address !!')
+                        messages.error(request,'خطأ في العنوان')
                         address_obj = None
 
             
@@ -213,26 +219,23 @@ def form_ads2(request):
                 serv.save()
                 ads= Advertisement(source= source_obj, advertiser_id= user_obj, 
                             Service_id=serv,is_active= status, area_id =address_obj,
-                            details= details, promoted= promoted)
+                            details= details)
                 ads.save()
                 messages.success(request , 'تم اضافة الاعلان بنجاح')
                 return redirect('advertiser_app:dashbord')
-                is_added=True
-
-
+            
             else:
                 messages.error(request, 'تأكد من الحقول الفارغة')
-                # return render(request, "advertiser/form_ads2.html",{
-                #     'service_de':Services_details.objects.all(),
-                #     'area': Area.objects.all(),
-                #     'user':Advertiser.objects.filter(ID= 1),
-                #     'service':service_id,
-                #     'address':address_id,
-                #     'promote':promoted,
-                #     'details':details,
-                #     'status':status,
+                return render(request, 'advertiser/form_ads2.html',{
+                    'service_de':Services_details.objects.all(),
+                    'area': Area.objects.all(),
+                    'user':Advertiser.objects.filter(ID= 1),
+                    'service_id':service_id,
+                    'address_id':address_id,
+                    'details':details,
+                    'status':status,
 
-                # })
+                })
 
         return render(request, "advertiser/form_ads2.html", context)
 
@@ -284,6 +287,8 @@ def update_form_ads(request, ad_id):
                 space = request.POST.get('space')
                 price = request.POST.get('price')
                 address = request.POST.get('address')
+                latitude= request.POST.get('latitude')
+                longitude= request.POST.get('longitude')
                 # img_files = request.FILES.getlist('image')  # Get the list of uploaded files
                 details = request.POST.get('details')
 
@@ -308,6 +313,10 @@ def update_form_ads(request, ad_id):
                     errors.append('يرجى إدخال السعر.')
                 if not address:
                     errors.append('يرجى اختيار العنوان.')
+                if not longitude:
+                    errors.append('يرجى التأكد الموقع الجغرافي.')
+                if not latitude:
+                    errors.append('يرجى التأكد الموقع الجغرافي.')
             # if not img_files:
             #     errors.append('يرجى تحميل صورة واحدة على الأقل.')
 
@@ -323,8 +332,8 @@ def update_form_ads(request, ad_id):
                         # Create RealEstate instance
                         ad_realestate.type_id=type_obj
                         
-                        ad_realestate.longitude=12.5
-                        ad_realestate.attitude=100.5  
+                        ad_realestate.longitude= longitude
+                        ad_realestate.attitude=latitude  
                         ad_realestate.space=space
                         ad_realestate.price=price
                         ad_realestate.rooms=rooms
@@ -380,7 +389,7 @@ def update_form_ads2(request, ad_id):
             'user':advertiser,
             'ad_servise':ad_servise,
             'ad':ad,
-            'is_auth':is_auth
+            'is_auth':is_auth,
                 }
 
             if request.method == 'POST' and 'update' in request.POST:
@@ -405,15 +414,10 @@ def update_form_ads2(request, ad_id):
                 else:
                     messages.error(request, 'خطأ في حالة الاعلان')
 
-                if 'promote' in request.POST:
-                    promoted = request.POST['promote']
-                else:
-                    messages.error(request, 'خطأ في ترويج الاعلان')
-
                 if 'details' in request.POST:
                     details = request.POST['details']
 
-                if user and service_id and address_id and status and promoted:
+                if user and service_id and address_id and status:
 
                     try:
                         user_obj = Advertiser.objects.get(ID=advertiser.ID)
@@ -440,7 +444,6 @@ def update_form_ads2(request, ad_id):
                     ad.Service_id = ad_servise
                     ad.is_active = status
                     ad.details = details
-                    ad.promoted = promoted
                     ad.area_id=address_obj
                     ad.upddate_date= date.today()
 

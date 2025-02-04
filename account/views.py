@@ -8,7 +8,18 @@ import re
 from django.http import HttpResponse
 from django.contrib import auth
 #from advertiser_app.models import Feature , RealEstateType, Area, advertisement , User , Advertiser
+from django.shortcuts import get_object_or_404, render , redirect
+from django.contrib.auth.models import User
+from django.http import Http404
+from django.contrib import messages
+from Advertiser.models import Advertiser, AdsSource, Profile
+from django.contrib.auth.models import User
+import re
+from django.contrib import auth
+#from advertiser_app.models import Feature , RealEstateType, Area, advertisement , User , Advertiser
+
 def adsSignup(request):
+    
     username = None
     email = None
     f_name= None
@@ -72,8 +83,7 @@ def adsSignup(request):
                         if User.objects.filter(email=email).exists():
                             messages.error(request, ' البريد الالكتروتي موجود مسبقا .!')
                         else:
-                            patt = r"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"
-
+                            patt = "^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"
                             if re.match(patt, email):
                                 # add user
                                 user= User.objects.create_user(first_name = f_name, 
@@ -87,36 +97,57 @@ def adsSignup(request):
                                                 status= True, 
                                                 ID_number=id_number)
                                 ad.save()
-                                #clear fields after registed
-                                f_name=''
-                                l_name=''
-                                email=''
-                                username=''
-                                password=''
-                                conf_password=''
-                                id_number=''
-                                messages.success(request,'تم')
+                                profile = Profile(user=user, is_advertiser = True)
+                                profile.save()
+                                auth.login(request, user)
+                                messages.success(request,f'{user.last_name} {user.first_name}  مرحبا'  )
                                 return redirect("advertiser_app:dashbord")
                             else:
                                 messages.error(request,'البريد الالكتروني غير صالح')
+                                return render(request, "account/usersignup.html", {
+                                'fname':f_name,
+                                'lname':l_name,
+                                'email':email,
+                                'username':username,
+                                'pass':password,
+                                'conf_pass':conf_password,
+                                'is_added':is_added
+                            })
             else:
                 messages.error(request, 'تأكد من تطابق حقول كلمة المرور و تأكيد كلمة المرور')
+                return render(request, "account/usersignup.html", {
+                'fname':f_name,
+                'lname':l_name,
+                'email':email,
+                'username':username,
+                'pass':password,
+                'conf_pass':conf_password,
+                'is_added':is_added
+            })
 
         else:
             messages.error(request, 'تأكد من الحقول الفارغة ')
-        # send the data that has been enter if there is error in some fields
-        return render(request, "account/usersignup.html", {
-            'fname':f_name,
-            'lname':l_name,
-            'email':email,
-            'username':username,
-            'pass':password,
-            'conf_pass':conf_password,
-            'is_added':is_added
-        })
+            return render(request, "account/usersignup.html", {
+                'fname':f_name,
+                'lname':l_name,
+                'email':email,
+                'username':username,
+                'pass':password,
+                'conf_pass':conf_password,
+                'is_added':is_added
+            })
     
     else:
-        return render(request, "account/AdsSignup.html",)
+        return render(request, "account/AdsSignup.html")
+    return render(request, "account/usersignup.html", {
+                'fname':f_name,
+                'lname':l_name,
+                'email':email,
+                'username':username,
+                'pass':password,
+                'conf_pass':conf_password,
+                'is_added':is_added
+            })
 
 def usersignup(request): 
     username = None
@@ -167,22 +198,24 @@ def usersignup(request):
                     if User.objects.filter(email=email).exists():
                         messages.error(request, ' البريد الالكتروتي موجود مسبقا .!')
                     else:
-                        patt = r"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"
-
+                        patt = "^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"
                         if re.match(patt, email):
                             # add user
                             user= User.objects.create_user(first_name = f_name, last_name= l_name,
                                                 email=email, username=username, password= password)
                             user.save()
                             #clear fields after registed
-                            f_name=''
-                            l_name=''
-                            email=''
-                            username=''
-                            password=''
-                            conf_password=''
-                            messages.success(request,'تم')
+                            # f_name=''
+                            # l_name=''
+                            # email=''
+                            # username=''
+                            # password=''
+                            # conf_password=''
                             is_added=True
+                            auth.login(request, user)
+                            messages.success(request,'تم')
+                            return redirect("index")
+                            
 
                         else:
                             messages.error(request,'البريد الالكتروني غير صالح')
@@ -230,6 +263,7 @@ def adslogin(request):
                         adv= get_object_or_404( Advertiser,user_ID=user.id)
                         if adv is not None:
                             auth.login(request, user)
+                            messages.success(request,f'{user.last_name} {user.first_name}  مرحبا'  )
                             return redirect('advertiser_app:dashbord')
                         else:
                             messages.error(request, 'ليس لديك صلاحيات للاعلان ... قم بانشاء حساب اولا')
@@ -243,12 +277,7 @@ def adslogin(request):
     
     return render(request, "account/Adslogin.html",)
 
-def profile(request, username):
-    user = get_object_or_404(User, username=username)
-    context = {
-        'user': user,
-    }
-    return render(request, 'account/profile.html', context)
+
 
 def vistorlogin(request):
 
@@ -271,7 +300,7 @@ def vistorlogin(request):
 
             if user is not None :
                 auth.login(request, user)
-                return render(request, 'core/index.html')
+                return redirect('index')
             else:
                 messages.error(request,'خطأ في اسم المستخدم او كلمة المرور')
 
@@ -279,6 +308,12 @@ def vistorlogin(request):
 
 
 def logout (request):
+    if request.user.is_authenticated:
+        auth.logout(request)
+    return redirect("index")
+
+# Create your views here.
+
     if request.user.is_authenticated:
         auth.logout(request)
     return redirect("index")

@@ -9,7 +9,7 @@ from django.contrib import auth
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from Advertiser.models import (
-    AdsSource, Rules, Services_details, Advertiser, Area,
+    AdsSource,  Services_details, Advertiser, Area,
     RealEstateType, RealEstate, Service, Feature, RealEstate_Feature,
     Advertisement, RealEstateImage, Rating, Favorite
 )

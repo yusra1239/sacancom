@@ -130,11 +130,11 @@
                 </div>
                 <div class="h5 mt-4">
                   <i class="ni business_briefcase-24 mr-2"></i>
-                  مستخدم
-
+                  معلن     
+                  
                 </div>
                 <div>
-                  <i class="ni education_hat mr-2"></i>
+                  <i class="ni education_hat mr-2"></i>{{ advertiser.phone_num}}
                 </div>
                 <hr class="my-4">
                 
@@ -155,13 +155,14 @@
             </div>             
 
             <div class="card-body" >
-              <form method="POST">
+              <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 {% include 'partials\_alert.html' %}
                 <div class="col-12 text-right">
                  <button class="btn btn-sm btn-primary" type="submit" name="update">save</button>
                 </div>
                 <h6 class="heading-small text-muted mb-4">المعلومات الشخصية</h6>
+                
                 <div class="pl-lg-4">
                   <div class="row">
                     <div class="col-lg-6">
@@ -206,13 +207,26 @@
                     </div>
                   </div>
                   <div class="row">
-                    <div class="input-group">
-                         <label for="profile_image">اختر صورة:</label>        
-                        <input class="form-control" type="file" id="formFile" name="image" multiple required>
+                    <div class="col-lg-6">
+                        <div class="form-group focused">
+                          <label class="form-control-label" >الرقم الوطني</label>
+                          <input type="number"  name="idnumber" value="{{ advertiser.ID_number}}" class="form-control form-control-alternative" placeholder="الرقم الوطني" >
+                        </div>
                     </div>
+                    <div class="col-lg-6">
+                        <div class="form-group focused">
+                          <label class="form-control-label" >رقم الهاتف</label>
+                          <input type="tel"  name="phonnum" value="{{ advertiser.phone_num}}" class="form-control form-control-alternative" placeholder="رقم الهاتف" >
+                        </div>
+                    </div>      
+                   <div class="form-group focused">
+                         <label for="profile_image">تغيير صورة البروفايل:</label>        
+                        <input class="form-control" type="file" id="formFile" name="profile_image" accept="image/*" required>
+                    </div>
+                  
                   </div>
-                  </div>
-                <hr class="my-4">
+                <hr class="my-4"> 
+               
                 {% comment %} <!-- Address -->
                 <h6 class="heading-small text-muted mb-4">Contact information</h6>
                 <div class="pl-lg-4">

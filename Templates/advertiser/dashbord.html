@@ -1,12 +1,15 @@
 {% extends 'advertiser/base.html'%}
 {% load static %}
-        
             {% block user %}
         <!-- user data Start -->
             {% comment %} {% if request.user.is_authenticated %} {% endcomment %}
             {% if user is not None %}
             <h6 class="mb-0">
-            {{user.user_ID.first_name }} {{user.user_ID.last_name }}     
+            {{user.user_ID.first_name }} {{user.user_ID.last_name }} 
+            {% if request.user.is_advertiser is True %}
+               <h6> {{ request.user.username }} </h6>
+            {% endif %}
+
             </h6>
             {% else %}
             <h6> </h6>
@@ -228,7 +231,7 @@
           </h6>
         {% endif %}
         {% else %}
-        <h5> you should <a href="{% url 'account:adslogin'%}"> logined in </a> </h5>
+        <h5> you should <a href="{% url 'account:adslogin'%}"> logined in {{request.user.profile.is_advertiser}} </a> </h5>
         {% comment %} {% endif %} {% endcomment %}
     {% endif %}
  </div>
@@ -236,3 +239,4 @@
         <!-- Content End -->
    
      {% endblock content %}
+
